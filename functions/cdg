@@ -1,0 +1,5 @@
+local cdup
+
+cdup="$(git rev-parse --show-cdup)" || return $?
+
+cd -- "./$cdup"

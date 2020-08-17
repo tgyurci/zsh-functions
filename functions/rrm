@@ -1,0 +1,5 @@
+local currdir
+
+currdir="${PWD:t}"
+cd ..
+rmdir -- "$currdir"
