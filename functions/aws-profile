@@ -1,0 +1,48 @@
+local opt_l opt_d opt
+local profile_name available_profiles
+
+while getopts ld opt; do
+	case "$opt" in
+		l) opt_l="1" ;;
+		d) opt_d="1" ;;
+		\?)
+			echo "Usage: aws-profile [-ld] [profile_name]" >&2
+			return 1
+		;;
+	esac
+done
+
+if [[ "$opt_l" = "1" && "$opt_d" = "1" ]]; then
+	echo "-l and -d should not be used together"
+	echo "Usage: aws-profile [-ld] [profile_name]" >&2
+	return 1
+fi
+
+if [[ "$opt_l" = "1" ]]; then
+	python3 -c 'import awscli.clidriver; print("\n".join(awscli.clidriver.create_clidriver().session.available_profiles))'
+	return 0
+fi
+
+if [[ "$opt_d" = "1" ]]; then
+	unset AWS_PROFILE
+	unset AWS_SDK_LOAD_CONFIG
+	return 0
+fi
+
+profile_name="$1"
+
+typeset -g AWS_PROFILE
+typeset -g AWS_SDK_LOAD_CONFIG
+
+available_profiles="$(python3 -c 'import awscli.clidriver; print(" ".join(awscli.clidriver.create_clidriver().session.available_profiles))')"
+
+if [[ " ${available_profiles} " != *" ${profile_name} "* ]]; then
+	echo "No such AWS profile: $profile_name"
+	return 1
+fi
+
+AWS_PROFILE="$profile_name"
+export AWS_PROFILE
+
+AWS_SDK_LOAD_CONFIG="1"
+export AWS_SDK_LOAD_CONFIG
