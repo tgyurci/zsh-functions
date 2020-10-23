@@ -1,5 +1,3 @@
-local currdir
+local current_dir="${PWD:t}"
 
-currdir="${PWD:t}"
-cd ..
-rmdir -- "$currdir"
+cd .. && rmdir -- "$current_dir"
