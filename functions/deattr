@@ -1,3 +1,2 @@
 xattr -d "com.apple.quarantine" "$@"
 xattr -d "com.apple.metadata:kMDItemWhereFroms" "$@"
-xattr -d "com.apple.lastuseddate#PS" "$@"
