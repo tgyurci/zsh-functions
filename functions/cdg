@@ -4,7 +4,7 @@ cdup="$(git rev-parse --show-cdup)" || return $?
 cdup="${cdup:-"./"}"
 
 if [[ "$#" -ge 1 && "$1" = "-p" ]]; then
-	print "$cdup"
+	print -- "$cdup"
 else
 	cd -- "$cdup"
 fi
