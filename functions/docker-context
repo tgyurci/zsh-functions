@@ -1,0 +1,33 @@
+local opt context
+
+if [[ "$#" -ne "1" ]]; then
+	echo "Usage: docker-context CONTEXT | -u | -l" >&2
+	return 1
+fi
+
+opt="$1"
+
+case "$opt" in
+	-u)
+		unset DOCKER_CONTEXT
+		return 0
+	;;
+	-l)
+		docker context ls -q
+		return $?
+	;;
+	-*)
+		echo "Invalid opt: $opt" >&2
+		echo "Usage: docker-context CONTEXT | -u | -l" >&2
+		return 1
+	;;
+	*) context="$opt" ;;
+esac
+
+if docker context ls -q | grep -qFx -e "$context"; then
+	typeset -xg DOCKER_CONTEXT
+	DOCKER_CONTEXT="$context"
+else
+	echo "Unknown Docker context: $context"
+	return 1
+fi
