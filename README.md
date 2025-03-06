@@ -22,7 +22,8 @@ And finally restart your shell.
 
 ## Functions
 
-* aws-profile: Front-end UI for scripts/aws-profile.  It sets/unsets the AWS_PROFILE env var
+* aws-profile: Sets/unsets the AWS_PROFILE and AWS_SDK_LOAD_CONFIG env vars used
+  by AWS clis and sdks
 * docker-context: Sets/unsets the DOCKER_CONTEXT env var used by Docker cli
 * cdg: Change up to the root directory of the current Git repository
 * deattr: Remove common macOS extended attributes from a file

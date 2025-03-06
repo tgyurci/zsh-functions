@@ -1,17 +1,39 @@
-typeset -g AWS_PROFILE
-typeset -g AWS_SDK_LOAD_CONFIG
+local opt profile
 
-local aws_profile_output aws_profile_ret
-aws_profile_output="$(command aws-profile "$@")"
-aws_profile_ret="$?"
-
-if [[ "$aws_profile_ret" != 0 ]]; then
-	return "$aws_profile_ret"
+if [[ "$#" -ne "1" ]]; then
+	echo "Usage: aws-profile PROFILE | -u | -l" >&2
+	return 1
 fi
 
-eval "$aws_profile_output"
+opt="$1"
 
-if [[ -z "$AWS_PROFILE" ]]; then
-	unset AWS_PROFILE
-	unset AWS_SDK_LOAD_CONFIG
+local list_profiles='from awscli.clidriver import create_clidriver; [print(profile) for profile in create_clidriver().session.available_profiles]'
+
+case "$opt" in
+	-u)
+		unset AWS_PROFILE
+		unset AWS_SDK_LOAD_CONFIG
+		return 0
+	;;
+	-l)
+		python3 -c "$list_profiles"
+		return $?
+	;;
+	-*)
+		echo "Invalid opt: $opt" >&2
+		echo "Usage: aws-profile PROFILE | -u | -l" >&2
+		return 1
+	;;
+	*) profile="$opt" ;;
+esac
+
+if python3 -c "$list_profiles" | grep -qFx -e "$profile"; then
+	typeset -xg AWS_PROFILE
+	AWS_PROFILE="$profile"
+
+	typeset -xg AWS_SDK_LOAD_CONFIG
+	AWS_SDK_LOAD_CONFIG="1"
+else
+	echo "Unknown aws profile: $profile"
+	return 1
 fi
